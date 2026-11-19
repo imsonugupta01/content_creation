@@ -344,9 +344,6 @@ export default function App() {
             </p>
           </div>
         </div>
-        <div className="text-sm text-slate-500 hidden md:block">
-          Powered by JSON2Video
-        </div>
       </header>
 
       <div className="flex-1 min-h-0 flex">
@@ -673,6 +670,17 @@ export default function App() {
             </div>
           )}
         </main>
+      </div>
+
+      {/* Bottom-right corner — Made with ❤️ by Sonu + Coming soon */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-1 pointer-events-none">
+        <div className="text-xs text-slate-500 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-800">
+          Made with <span className="text-red-400">❤️</span> by{" "}
+          <span className="font-semibold text-violet-400">Sonu</span>
+        </div>
+        <div className="text-[10px] text-amber-400/80 bg-slate-900/80 backdrop-blur px-2 py-1 rounded-md border border-slate-800">
+          ✨ More features coming soon
+        </div>
       </div>
     </div>
   );
