@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/proxy/veida/:path*",
+      "destination": "https://veida.ai/api/ai/:path*"
+    },
+    {
+      "source": "/proxy/json2video/:path*",
+      "destination": "https://api.json2video.com/v2/:path*"
+    }
+  ]
+}

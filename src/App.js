@@ -1,7 +1,8 @@
 import React, { useMemo, useRef, useState } from "react";
 import { api as PRESET_APIS } from "./Api_file.js";
 
-const API_URL = "https://api.json2video.com/v2";
+// const API_URL = "https://api.json2video.com/v2";
+const API_URL = "/proxy/json2video";
 
 const makeId = () =>
   window.crypto?.randomUUID?.() ||
