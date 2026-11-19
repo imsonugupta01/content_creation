@@ -338,7 +338,7 @@ export default function App() {
         <div className="flex items-center gap-3">
           <div className="text-2xl">🎬</div>
           <div>
-            <h1 className="text-xl font-bold leading-tight">Hindi AI Movie Studio</h1>
+            <h1 className="text-xl font-bold leading-tight">Tricky Online AI Studio</h1>
             <p className="text-sm text-slate-400 leading-tight">
               Photos + Hindi story → cinematic video
             </p>
