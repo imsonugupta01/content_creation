@@ -1,8 +1,8 @@
 import React, { useMemo, useRef, useState } from "react";
 import { api as PRESET_APIS } from "./Api_file.js";
+import StoryGenerator from "./Story.js";
 
-// const API_URL = "https://api.json2video.com/v2";
-const API_URL = "/proxy/json2video";
+const API_URL = "https://api.json2video.com/v2";
 
 const makeId = () =>
   window.crypto?.randomUUID?.() ||
@@ -328,10 +328,10 @@ export default function App() {
 
   const previewFrame =
     format === "vertical"
-      ? "aspect-[9/16] max-h-[calc(100vh-220px)] w-auto"
+      ? "aspect-[9/16] max-h-[calc(100vh-260px)] w-auto"
       : format === "square"
-      ? "aspect-square max-h-[calc(100vh-220px)] w-auto"
-      : "aspect-video max-h-[calc(100vh-220px)] w-full";
+      ? "aspect-square max-h-[calc(100vh-260px)] w-auto"
+      : "aspect-video max-h-[calc(100vh-260px)] w-full";
 
   return (
     <div className="h-screen w-screen bg-slate-950 text-white overflow-hidden flex flex-col">
@@ -347,27 +347,26 @@ export default function App() {
         </div>
       </header>
 
+      {/* 3-COLUMN LAYOUT */}
       <div className="flex-1 min-h-0 flex">
-        <aside className="w-full md:w-[46%] lg:w-[42%] xl:w-[38%] max-w-[680px] border-r border-slate-800 bg-slate-900/40 flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
 
-            {/* 1. STORY — sabse upar */}
+        {/* ===== COLUMN 1: AI Prompt + Images ===== */}
+        <aside className="w-full md:w-[28%] xl:w-[26%] border-r border-slate-800 bg-slate-900/40 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto p-4 space-y-5">
+
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Step 1 · Story & Images
+            </div>
+
+            {/* AI Prompt */}
             <section>
               <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                Hindi Narration
+                AI Prompt
               </label>
-              <textarea
-                value={story}
-                onChange={(e) => setStory(e.target.value)}
-                placeholder="अपनी कहानी यहां लिखें..."
-                className="w-full h-32 bg-slate-950 border border-slate-700 rounded-lg p-3 text-base outline-none focus:border-violet-500 resize-y"
-              />
-              <p className="text-xs text-slate-500 mt-1">
-                Commas/full-stops create natural pauses. Leave empty for silent slideshow.
-              </p>
+              <StoryGenerator onStoryGenerated={(generated) => setStory(generated)} />
             </section>
 
-            {/* 2. IMAGES — story ke neeche */}
+            {/* Images */}
             <section>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-semibold uppercase tracking-wider text-slate-300">
@@ -377,17 +376,17 @@ export default function App() {
                   <button
                     onClick={clearImages}
                     disabled={loading}
-                    className="text-sm text-red-400 hover:text-red-300"
+                    className="text-xs text-red-400 hover:text-red-300"
                   >
                     Remove All
                   </button>
                 )}
               </div>
 
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-violet-500 rounded-xl p-6 cursor-pointer bg-slate-950 transition">
-                <span className="text-4xl mb-2">📸</span>
-                <span className="text-base font-medium">Click to upload images</span>
-                <span className="text-sm text-slate-500 mt-1">JPG · PNG · WebP</span>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-violet-500 rounded-xl p-4 cursor-pointer bg-slate-950 transition">
+                <span className="text-3xl mb-1">📸</span>
+                <span className="text-sm font-medium">Upload images</span>
+                <span className="text-xs text-slate-500 mt-0.5">JPG · PNG · WebP</span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -400,7 +399,7 @@ export default function App() {
 
               {images.length > 0 && (
                 <div className="mt-3">
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {images.map((image, index) => (
                       <div
                         key={image.id}
@@ -410,7 +409,7 @@ export default function App() {
                           <img
                             src={image.preview}
                             alt={`Scene ${index + 1}`}
-                            className="w-full h-24 object-cover"
+                            className="w-full h-20 object-cover"
                           />
                           <span className="absolute top-1 left-1 bg-black/80 text-xs px-1.5 py-0.5 rounded">
                             {index + 1}
@@ -418,164 +417,69 @@ export default function App() {
                           <button
                             onClick={() => removeImage(image.id)}
                             disabled={loading}
-                            className="absolute top-1 right-1 bg-red-600/90 hover:bg-red-500 rounded-full w-6 h-6 text-xs"
+                            className="absolute top-1 right-1 bg-red-600/90 hover:bg-red-500 rounded-full w-5 h-5 text-[10px]"
                           >
                             ✕
                           </button>
                         </div>
-                        <div className="flex justify-between p-1.5">
+                        <div className="flex justify-between p-1">
                           <button
                             onClick={() => moveImage(index, -1)}
                             disabled={loading || index === 0}
-                            className="px-2 py-1 text-sm bg-slate-800 hover:bg-slate-700 rounded disabled:opacity-30"
+                            className="px-1.5 py-0.5 text-xs bg-slate-800 hover:bg-slate-700 rounded disabled:opacity-30"
                           >←</button>
                           <button
                             onClick={() => moveImage(index, 1)}
                             disabled={loading || index === images.length - 1}
-                            className="px-2 py-1 text-sm bg-slate-800 hover:bg-slate-700 rounded disabled:opacity-30"
+                            className="px-1.5 py-0.5 text-xs bg-slate-800 hover:bg-slate-700 rounded disabled:opacity-30"
                           >→</button>
                         </div>
                       </div>
                     ))}
                   </div>
                   <p className="text-xs text-slate-500 mt-2">
-                    Total: {(estimatedUploadSize / (1024 * 1024)).toFixed(1)} MB · compressed on upload
+                    {(estimatedUploadSize / (1024 * 1024)).toFixed(1)} MB · compressed on upload
                   </p>
                 </div>
               )}
             </section>
+          </div>
+        </aside>
 
-            {/* 3. API Selector */}
+        {/* ===== COLUMN 2: Story Response (Center) ===== */}
+        <main className="w-full md:w-[38%] xl:w-[40%] border-r border-slate-800 bg-slate-900/20 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Step 2 · Review & Edit Story
+            </div>
+
             <section>
               <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                JSON2Video API
+                Generated Hindi Story
               </label>
-
-              <select
-                value={selectedApiName}
-                onChange={(e) => setSelectedApiName(e.target.value)}
-                disabled={loading}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-3 text-base outline-none focus:border-violet-500"
-              >
-                {(PRESET_APIS || []).map((a) => (
-                  <option key={a.name} value={a.name}>
-                    {a.name}
-                  </option>
-                ))}
-                <option value="custom">Use my own API key</option>
-              </select>
-
-              {selectedApiName === "custom" && (
-                <input
-                  type="password"
-                  value={customApiKey}
-                  onChange={(e) => setCustomApiKey(e.target.value)}
-                  placeholder="Paste your API key"
-                  className="mt-2 w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-3 text-base outline-none focus:border-violet-500"
-                />
-              )}
-
-              <p className="text-xs text-amber-400 mt-2">
-                ⚠ Local testing only — API key is visible in browser requests.
+              <textarea
+                value={story}
+                onChange={(e) => setStory(e.target.value)}
+                placeholder="AI se story generate karo, ya yahan khud likho..."
+                className="w-full h-[40vh] bg-slate-950 border border-slate-700 rounded-lg p-4 text-base leading-relaxed outline-none focus:border-violet-500 resize-none"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                Commas/full-stops natural pauses create karte hain. Leave empty for silent slideshow.
               </p>
             </section>
 
-            {/* Voice + Format */}
-            <div className="grid grid-cols-2 gap-3">
-              <section>
-                <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                  Voice
-                </label>
-                <select
-                  value={voice}
-                  onChange={(e) => setVoice(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-base"
-                >
-                  <option value="hi-IN-MadhurNeural">Madhur (Male)</option>
-                  <option value="hi-IN-SwaraNeural">Swara (Female)</option>
-                </select>
-              </section>
-
-              <section>
-                <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                  Format
-                </label>
-                <select
-                  value={format}
-                  onChange={(e) => setFormat(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-base"
-                >
-                  <option value="vertical">9:16 Reels</option>
-                  <option value="landscape">16:9 YouTube</option>
-                  <option value="square">1:1 Square</option>
-                </select>
-              </section>
-            </div>
-
-            {/* Duration + Transition */}
-            <div className="grid grid-cols-2 gap-3">
-              <section>
-                <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                  Min Duration
-                </label>
-                <select
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-base"
-                >
-                  <option value={3}>3s</option>
-                  <option value={5}>5s</option>
-                  <option value={7}>7s</option>
-                  <option value={10}>10s</option>
-                </select>
-              </section>
-
-              <section>
-                <label className="block text-sm font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                  Transition
-                </label>
-                <select
-                  value={transition}
-                  onChange={(e) => setTransition(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-base"
-                >
-                  <option value="fade">Fade</option>
-                  <option value="dissolve">Dissolve</option>
-                  <option value="wipeleft">Wipe Left</option>
-                  <option value="slideright">Slide Right</option>
-                  <option value="circleopen">Circle Open</option>
-                  <option value="none">None</option>
-                </select>
-              </section>
-            </div>
-
-            {/* Toggles */}
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-3 cursor-pointer">
+            {/* Duration estimate + Generate button */}
+            <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg px-4 py-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-base font-medium">Motion</p>
-                  <p className="text-xs text-slate-500">Zoom + pan</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider">Estimated Duration</p>
+                  <p className="text-2xl font-bold">{formatTime(estimatedDuration)}</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={motion}
-                  onChange={(e) => setMotion(e.target.checked)}
-                  className="w-5 h-5 accent-violet-500"
-                />
-              </label>
-
-              <label className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-3 cursor-pointer">
-                <div>
-                  <p className="text-base font-medium">Subtitles</p>
-                  <p className="text-xs text-slate-500">Hindi auto</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={subtitles}
-                  onChange={(e) => setSubtitles(e.target.checked)}
-                  className="w-5 h-5 accent-violet-500"
-                />
-              </label>
+                <p className={`text-xs ${estimatedDuration > 60 ? "text-red-400" : "text-slate-500"}`}>
+                  Limit: 60s
+                </p>
+              </div>
             </div>
 
             {error && (
@@ -583,18 +487,6 @@ export default function App() {
                 {error}
               </div>
             )}
-          </div>
-
-          <div className="shrink-0 border-t border-slate-800 bg-slate-900/90 backdrop-blur px-5 py-4 space-y-3">
-            <div className="flex items-center justify-between bg-violet-500/10 border border-violet-500/20 rounded-lg px-3 py-2">
-              <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Estimated Duration</p>
-                <p className="text-xl font-bold">{formatTime(estimatedDuration)}</p>
-              </div>
-              <p className={`text-xs ${estimatedDuration > 60 ? "text-red-400" : "text-slate-500"}`}>
-                Limit: 60s
-              </p>
-            </div>
 
             <button
               onClick={generateVideo}
@@ -603,14 +495,42 @@ export default function App() {
             >
               {loading ? "Creating..." : "🎬 Generate Movie"}
             </button>
-          </div>
-        </aside>
 
-        <main className="flex-1 min-w-0 flex flex-col bg-slate-950 p-4 md:p-6">
-          <div className="flex-1 flex items-center justify-center min-h-0">
-            {videoUrl ? (
-              <div className="flex flex-col items-center gap-4 max-h-full">
-                <div className={`${previewFrame} overflow-hidden rounded-2xl bg-black border border-slate-700 shadow-2xl`}>
+            {loading && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-slate-400">
+                  <span>{status}</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-violet-500 transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {status && !loading && !videoUrl && (
+              <div className="text-center text-sm text-violet-300">
+                {status}
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* ===== COLUMN 3: Video Preview + Config ===== */}
+        <aside className="hidden md:flex md:w-[34%] xl:w-[34%] bg-slate-950 flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Step 3 · Preview & Settings
+            </div>
+
+            {/* Video preview */}
+            <div className="flex items-center justify-center bg-black/40 rounded-xl border border-slate-800 p-3 min-h-[280px]">
+              {videoUrl ? (
+                <div className={`${previewFrame} overflow-hidden rounded-lg bg-black border border-slate-700`}>
                   <video
                     key={videoUrl}
                     src={videoUrl}
@@ -620,60 +540,168 @@ export default function App() {
                     className="w-full h-full object-contain bg-black"
                   />
                 </div>
-                <div className="flex gap-2 w-full max-w-md">
-                  <a
-                    href={videoUrl}
-                    download="my-hindi-movie.mp4"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 text-center bg-green-600 hover:bg-green-500 py-3 rounded-lg font-semibold text-base"
-                  >
-                    ⬇ Download
-                  </a>
-                  <button
-                    onClick={() => { setVideoUrl(""); setStatus(""); }}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 py-3 rounded-lg font-semibold text-base"
-                  >
-                    New Movie
-                  </button>
+              ) : (
+                <div className="text-center px-4">
+                  <div className="text-6xl mb-3 opacity-30">🎞</div>
+                  <p className="text-slate-400 text-sm max-w-xs">
+                    {loading
+                      ? status || "Creating your movie..."
+                      : "Video yahan dikhegi jab generate karoge."}
+                  </p>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center px-6">
-                <div className="text-7xl mb-4 opacity-30">🎞</div>
-                <p className="text-slate-400 text-base max-w-sm">
-                  {loading
-                    ? status || "Creating your movie..."
-                    : "Configure settings on the left and click Generate to preview your movie here."}
-                </p>
+              )}
+            </div>
+
+            {/* Download / New buttons */}
+            {videoUrl && (
+              <div className="flex gap-2">
+                <a
+                  href={videoUrl}
+                  download="my-hindi-movie.mp4"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center bg-green-600 hover:bg-green-500 py-2.5 rounded-lg font-semibold text-sm"
+                >
+                  ⬇ Download
+                </a>
+                <button
+                  onClick={() => { setVideoUrl(""); setStatus(""); }}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 py-2.5 rounded-lg font-semibold text-sm"
+                >
+                  New Movie
+                </button>
               </div>
             )}
-          </div>
 
-          {loading && (
-            <div className="mt-3 space-y-2 shrink-0">
-              <div className="flex justify-between text-sm text-slate-400">
-                <span>{status}</span>
-                <span>{progress}%</span>
-              </div>
-              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-violet-500 transition-all duration-500"
-                  style={{ width: `${progress}%` }}
+            {/* Config: API */}
+            <section>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                JSON2Video API
+              </label>
+              <select
+                value={selectedApiName}
+                onChange={(e) => setSelectedApiName(e.target.value)}
+                disabled={loading}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500"
+              >
+                {(PRESET_APIS || []).map((a) => (
+                  <option key={a.name} value={a.name}>{a.name}</option>
+                ))}
+                <option value="custom">Use my own API key</option>
+              </select>
+              {selectedApiName === "custom" && (
+                <input
+                  type="password"
+                  value={customApiKey}
+                  onChange={(e) => setCustomApiKey(e.target.value)}
+                  placeholder="Paste your API key"
+                  className="mt-2 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-violet-500"
                 />
-              </div>
-            </div>
-          )}
+              )}
+            </section>
 
-          {status && !loading && !videoUrl && (
-            <div className="mt-3 text-center text-sm text-violet-300 shrink-0">
-              {status}
+            {/* Voice + Format */}
+            <div className="grid grid-cols-2 gap-2">
+              <section>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Voice
+                </label>
+                <select
+                  value={voice}
+                  onChange={(e) => setVoice(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm"
+                >
+                  <option value="hi-IN-MadhurNeural">Madhur</option>
+                  <option value="hi-IN-SwaraNeural">Swara</option>
+                </select>
+              </section>
+              <section>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Format
+                </label>
+                <select
+                  value={format}
+                  onChange={(e) => setFormat(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm"
+                >
+                  <option value="vertical">9:16</option>
+                  <option value="landscape">16:9</option>
+                  <option value="square">1:1</option>
+                </select>
+              </section>
             </div>
-          )}
-        </main>
+
+            {/* Duration + Transition */}
+            <div className="grid grid-cols-2 gap-2">
+              <section>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Min Duration
+                </label>
+                <select
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm"
+                >
+                  <option value={3}>3s</option>
+                  <option value={5}>5s</option>
+                  <option value={7}>7s</option>
+                  <option value={10}>10s</option>
+                </select>
+              </section>
+              <section>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Transition
+                </label>
+                <select
+                  value={transition}
+                  onChange={(e) => setTransition(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm"
+                >
+                  <option value="fade">Fade</option>
+                  <option value="dissolve">Dissolve</option>
+                  <option value="wipeleft">Wipe</option>
+                  <option value="slideright">Slide</option>
+                  <option value="circleopen">Circle</option>
+                  <option value="none">None</option>
+                </select>
+              </section>
+            </div>
+
+            {/* Toggles */}
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-2 cursor-pointer">
+                <div>
+                  <p className="text-xs font-medium">Motion</p>
+                  <p className="text-[10px] text-slate-500">Zoom + pan</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={motion}
+                  onChange={(e) => setMotion(e.target.checked)}
+                  className="w-4 h-4 accent-violet-500"
+                />
+              </label>
+              <label className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-2 cursor-pointer">
+                <div>
+                  <p className="text-xs font-medium">Subtitles</p>
+                  <p className="text-[10px] text-slate-500">Hindi auto</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={subtitles}
+                  onChange={(e) => setSubtitles(e.target.checked)}
+                  className="w-4 h-4 accent-violet-500"
+                />
+              </label>
+            </div>
+
+            <p className="text-[11px] text-amber-400">
+              ⚠ Local testing only — API key is visible in browser requests.
+            </p>
+          </div>
+        </aside>
       </div>
 
-      {/* Bottom-right corner — Made with ❤️ by Sonu + Coming soon */}
       <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-1 pointer-events-none">
         <div className="text-xs text-slate-500 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-800">
           Made with <span className="text-red-400">❤️</span> by{" "}
