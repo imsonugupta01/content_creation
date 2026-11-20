@@ -1,5 +1,5 @@
 // check-groq.js
-const GROQ_API_KEY = "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"; // gsk_ se shuru hoti hai
+const GROQ_API_KEY = ""; // gsk_ se shuru hoti hai
 
 async function checkGroqKey() {
   try {
