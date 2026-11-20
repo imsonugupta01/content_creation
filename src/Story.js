@@ -1,27 +1,41 @@
+
 import React, { useState } from "react";
-import { GROQ_API_KEY } from "./Api_file.js";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
+const GROQ_API_KEY = process.env.REACT_APP_GROQ_API_KEY;
+
 async function generateStory(idea) {
+  if (!GROQ_API_KEY) {
+    throw new Error("Groq API key missing. Check your .env file.");
+  }
+
   const prompt = `Write a very short Hindi story in 3-4 lines about: ${idea}. End each line with a full stop (।). Only give story text, no title or explanation.`;
 
   const response = await fetch(GROQ_URL, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${GROQ_API_KEY}`,
+      Authorization: `Bearer ${GROQ_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       model: "openai/gpt-oss-120b",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.8,
     }),
   });
 
   const data = await response.json();
 
-  if (data.error) {
-    throw new Error(data.error.message);
+  if (!response.ok) {
+    throw new Error(
+      data.error?.message || "Groq API request failed."
+    );
   }
 
   return data.choices?.[0]?.message?.content?.trim() || "";
@@ -43,6 +57,11 @@ export default function StoryGenerator({ onStoryGenerated }) {
 
     try {
       const story = await generateStory(idea.trim());
+
+      if (!story) {
+        throw new Error("Empty story received. Try again.");
+      }
+
       onStoryGenerated(story);
       setIdea("");
     } catch (err) {
@@ -58,7 +77,6 @@ export default function StoryGenerator({ onStoryGenerated }) {
         ✨ AI Story Generator (Groq)
       </label>
 
-      {/* Bada textarea */}
       <textarea
         value={idea}
         onChange={(e) => setIdea(e.target.value)}
@@ -76,7 +94,9 @@ export default function StoryGenerator({ onStoryGenerated }) {
         {loading ? "Story ban rahi hai..." : "🪄 Generate Story"}
       </button>
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && (
+        <p className="text-xs text-red-400">{error}</p>
+      )}
     </div>
   );
 }
